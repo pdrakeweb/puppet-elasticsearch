@@ -5,7 +5,7 @@
 # Usage:
 # include elasticsearch
 
-class elasticsearch($version = "0.15.2", $xmx = "2048m") {
+class elasticsearch($version = "0.18.6", $xmx = "1024m") {
       $esBasename       = "elasticsearch"
       $esName           = "${esBasename}-${version}"
       $esFile           = "${esName}.tar.gz"
