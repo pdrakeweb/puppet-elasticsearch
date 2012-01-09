@@ -5,17 +5,17 @@
 # Usage:
 # include elasticsearch
 
-class elasticsearch($version = "0.18.6", $xmx = "1024m") {
+class elasticsearch($version = "0.18.6", $xmx = "1024m", $esServiceCommit = "3e0b23d") {
       $esBasename       = "elasticsearch"
       $esName           = "${esBasename}-${version}"
       $esFile           = "${esName}.tar.gz"
       $esServiceName    = "${esBasename}-servicewrapper"
       $esServiceFile    = "${esServiceName}.tar.gz"
-      $esPath           = "${ebs1}/usr/local/${esName}"
+      $esPath           = "/usr/local/${esName}"
       $esPathLink       = "/usr/local/${esBasename}"
-      $esDataPath       = "${ebs1}/var/lib/${esBasename}"
+      $esDataPath       = "/var/lib/${esBasename}"
       $esLibPath        = "${esDataPath}"
-      $esLogPath        = "${ebs1}/var/log/${esBasename}"
+      $esLogPath        = "/var/log/${esBasename}"
       $esXms            = "256m"
       $esXmx            = "${xmx}"
       $cluster          = "${esBasename}"
@@ -26,15 +26,16 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
       $esPidpath        = "/var/run"
       $esPidfile        = "${esPidpath}/${esBasename}.pid"
       $esJarfile        = "${esName}.jar"
+      
+      include Java
        
       # Ensure the elasticsearch user is present
       user { "$esBasename":
                ensure => "present",
                comment => "Elasticsearch user created by puppet",
                managehome => true,
-               shell   => "/bin/false",          
-               require => [Package["sun-java6-jre"], lvmconfig[$ebs1]],
-               uid => 901
+               shell   => "/bin/false",
+               uid => 901,
      }
      
      file { "/etc/security/limits.d/${esBasename}.conf":
@@ -43,20 +44,12 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
             owner => root,
             group => root,
      }
-     
-#     file { "/etc/init/${esBasename}.conf":
-#          content => template("elasticsearch/upstart.elasticsearch.conf.erb"),
-#          ensure => present,
-#          owner => root,
-#          group => root,
-#          mode => 644
-#     }
 
      exec { "mkdir-ebs-mongohome":
           path => "/bin:/usr/bin",
           command => "mkdir -p $ebs1/usr/local",
           before => File["$esPath"],
-          require => user["$esBasename"]
+          require => User["$esBasename"]
      }    
 
      # Make sure we have the application path
@@ -70,7 +63,7 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
       
       # Temp location
       file { "/tmp/$esFile":
-             source  => "puppet:///elasticsearch/$esFile",
+             source  => "puppet:///modules/elasticsearch/$esFile",
              require => File["$esPath"],
              owner => "$esBasename"
       }
@@ -90,7 +83,8 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
            unless => "ps aux | grep ${esName} | grep -v grep",
            onlyif => "ps aux | grep ${esBasename} | grep -v grep",
            require => Exec["elasticsearch-package"],
-           notify => Service["$esBasename"]
+           notify => Service["$esBasename"],
+           path => ["/bin", "/sbin", "/usr/bin", "/usr/sbin"],
       }
 
       # Create link to /usr/local/<esBasename> which will be the current version
@@ -108,13 +102,6 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
            group  => "$esBasename",
            require => Exec["elasticsearch-package"],
            recurse => true           
-      }
-
-      # Ensure the data path is created
-      file { "/var/lib/${esBasename}":
-           ensure => link,
-           target => "${esDataPath}",
-           require => File["$esDataPath"],
       }
 
       # Ensure the link to the data path is set
@@ -140,16 +127,16 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
       
       # Stage the Service Package
       file { "/tmp/$esServiceFile":
-           source => "puppet:///elasticsearch/$esServiceFile",
-            require => Exec["elasticsearch-package"]
+           source => "puppet:///modules/elasticsearch/$esServiceFile",
+           require => Exec["elasticsearch-package"]
       }
       
       # Move the service wrapper into place
       exec { "elasticsearch-service":
              path => "/bin:/usr/bin",
              unless => "test -d $esPath/bin/service/lib",
-             command => "tar -xzf /tmp/$esServiceFile -C /tmp && mv /tmp/$esServiceName/service $esPath/bin && rm /tmp/$esServiceFile",
-             require => [file["/tmp/$esServiceFile"], user["$esBasename"]]
+             command => "tar -xzf /tmp/$esServiceFile -C /tmp && mv /tmp/${esBasename}-${esServiceName}-${esServiceCommit}/service $esPath/bin && rm /tmp/$esServiceFile",
+             require => [File["/tmp/$esServiceFile"], User["$esBasename"]]
       }
 
       # Ensure the service is present
@@ -164,13 +151,14 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
       # Set the service config settings
       file { "$esPath/bin/service/elasticsearch.conf":
              content => template("elasticsearch/elasticsearch.conf.erb"),
-             require => file["$esPath/bin/service"]
+             require => File["$esPath/bin/service"]
       }
       
       # Add customized startup script (see: http://www.elasticsearch.org/tutorials/2011/02/22/running-elasticsearch-as-a-non-root-user.html)
       file { "$esPath/bin/service/elasticsearch":
-             source => "puppet:///elasticsearch/elasticsearch",
-             require => file["$esPath/bin/service"]
+             source => "puppet:///modules/elasticsearch/elasticsearch",
+             require => File["$esPath/bin/service"],
+             mode => 0755,
       }
 
       # Create startup script
@@ -186,29 +174,16 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m") {
            group     => "$esBasename",
            ensure    => directory,
            recurse   => true,
-           require   => exec["elasticsearch-package"],
-      }
-      
-      # Ensure logging link is in place
-      file { "/var/log/$esBasename":
-           ensure => link,
-           target => "$esLogPath",
-           require => [File["${esLogPath}"], File["/etc/init.d/$esBasename"]]
+           require   => Exec["elasticsearch-package"],
       }
 
-      file { "$esPath/logs":
-           ensure => link,
-           target => "/var/log/$esBasename",
-           force => true,
-           require => File["/var/log/$esBasename"]
-      }
             
       # Ensure the service is running
       service { "$esBasename":
             enable => true,
             ensure => running,
             hasrestart => true,
-            require => File["$esPath/logs"]
+            require => File["$esLogPath"]
       }
 
 }
