@@ -1,0 +1,30 @@
+{
+  "types": [
+
+  ],
+  "license": "UNKNOWN",
+  "description": "UNKNOWN",
+  "summary": "UNKNOWN",
+  "source": "UNKNOWN",
+  "project_page": "UNKNOWN",
+  "author": "puppet",
+  "checksums": {
+    "templates/elasticsearch.conf.erb": "f0a1a254f31c90053267ba593918dbc4",
+    "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909",
+    "templates/elasticsearch.yml.erb": "10553d6ff40c3c3d1596b4daafea8ec1",
+    "templates/upstart.elasticsearch.conf.erb": "7bd4508d24457e103901d03a1b7f4e8e",
+    "README": "99e3a358a9ebdd6ea144c28c0d327d58",
+    "tests/init.pp": "2678f45f0e1310cf7a7a5b3b413dfc62",
+    "templates/elasticsearch.limits.conf.erb": "1e7f1696fd751fb81fdeaa624dd3c20d",
+    "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
+    "metadata.json": "d34d0b70aba36510fbc2df4e667479ef",
+    "files/elasticsearch": "a04712bdec997b3e491d914e83f4340c",
+    "Modulefile": "8783714aa1fa0389933486b799df8b13",
+    "manifests/init.pp": "309ade3bcbfc8e5a7ef6039632aeb064"
+  },
+  "version": "0.0.1",
+  "name": "puppet-elasticsearch",
+  "dependencies": [
+
+  ]
+}
