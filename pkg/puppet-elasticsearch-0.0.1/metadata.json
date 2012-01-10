@@ -2,12 +2,12 @@
   "types": [
 
   ],
-  "license": "UNKNOWN",
-  "description": "UNKNOWN",
-  "summary": "UNKNOWN",
-  "source": "UNKNOWN",
-  "project_page": "UNKNOWN",
-  "author": "puppet",
+  "license": "apache",
+  "description": "Installs elasticsearch and configures elasticsearch to run as a service.",
+  "summary": "Installs elasticsearch.",
+  "source": "git://github.com/pdrakeweb/puppet-elasticsearch",
+  "project_page": "https://github.com/pdrakeweb/puppet-elasticsearch",
+  "author": "pdrakeweb",
   "checksums": {
     "templates/elasticsearch.conf.erb": "f0a1a254f31c90053267ba593918dbc4",
     "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909",
@@ -19,12 +19,15 @@
     "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
     "metadata.json": "d34d0b70aba36510fbc2df4e667479ef",
     "files/elasticsearch": "a04712bdec997b3e491d914e83f4340c",
-    "Modulefile": "8783714aa1fa0389933486b799df8b13",
+    "Modulefile": "ea7a551c3ca864c47c1f969ee7013809",
     "manifests/init.pp": "309ade3bcbfc8e5a7ef6039632aeb064"
   },
   "version": "0.0.1",
   "name": "puppet-elasticsearch",
   "dependencies": [
-
+    {
+      "version_requirement": ">= 0.1.5",
+      "name": "puppetlabs/java"
+    }
   ]
 }
