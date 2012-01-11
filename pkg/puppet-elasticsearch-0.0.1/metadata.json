@@ -19,8 +19,8 @@
     "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
     "metadata.json": "d34d0b70aba36510fbc2df4e667479ef",
     "files/elasticsearch": "a04712bdec997b3e491d914e83f4340c",
-    "Modulefile": "ea7a551c3ca864c47c1f969ee7013809",
-    "manifests/init.pp": "309ade3bcbfc8e5a7ef6039632aeb064"
+    "Modulefile": "1603144517ef1ea5d44166bee6b9c9b6",
+    "manifests/init.pp": "b456c45cef90c975e1be68412a01117e"
   },
   "version": "0.0.1",
   "name": "puppet-elasticsearch",

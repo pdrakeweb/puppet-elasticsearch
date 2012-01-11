@@ -45,13 +45,6 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m", $esServiceCommit = "3e0
             group => root,
      }
 
-     exec { "mkdir-ebs-mongohome":
-          path => "/bin:/usr/bin",
-          command => "mkdir -p $ebs1/usr/local",
-          before => File["$esPath"],
-          require => User["$esBasename"]
-     }    
-
      # Make sure we have the application path
      file { "$esPath":
              ensure     => directory,

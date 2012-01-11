@@ -6,6 +6,4 @@ license 'apache'
 summary 'Installs elasticsearch.'
 description 'Installs elasticsearch and configures elasticsearch to run as a service.'
 project_page 'https://github.com/pdrakeweb/puppet-elasticsearch'
-
-## Add dependencies, if any:
 dependency 'puppetlabs/java', '>= 0.1.5'
