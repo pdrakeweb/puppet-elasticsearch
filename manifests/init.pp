@@ -176,7 +176,7 @@ class elasticsearch($version = "0.18.6", $xmx = "1024m", $esServiceCommit = "3e0
             enable => true,
             ensure => running,
             hasrestart => true,
-            require => File["$esLogPath"]
+            require => [ File["$esLogPath"], File["/etc/init.d/elasticsearch"] ],
       }
 
 }
